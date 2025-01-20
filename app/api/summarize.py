@@ -39,6 +39,9 @@ def summarize_document():
       - form-data 'prompt' for the summary instructions
     """
     print("Received request to /api/summarize")
+    print("request.content_type:", request.content_type)
+    print("request.form:", request.form)
+    print("request.files:", request.files)
     
     try:
         # Retrieve file and prompt from the request
