@@ -1,3 +1,7 @@
+export const config = {
+  runtime: 'nodejs', // Ensure we're NOT using edge
+};
+
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
