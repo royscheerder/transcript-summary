@@ -1,8 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   console.log("API route: Received request");
-  console.log("Headers:", req.headers);
+  console.log("Headers:", request.headers);
 
   try {
     // Ensure the environment variable is available
@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Extract form data
-    const formData = await req.formData();
+    const formData = await request.formData();
     console.log(
       "API route: FormData received",
       Array.from(formData.entries()).map(([key, value]) =>
