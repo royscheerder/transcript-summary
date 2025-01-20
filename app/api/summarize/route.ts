@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   console.log("API route: Received request");
-  console.log("Headers:", request.headers);
+  console.log("Headers:", req.headers);
 
   try {
     // Ensure the environment variable is available
