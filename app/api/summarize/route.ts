@@ -1,6 +1,4 @@
-export const config = {
-  runtime: 'nodejs', // Ensure we're NOT using edge
-};
+export const runtime = 'nodejs';
 
 import { type NextRequest, NextResponse } from "next/server";
 
