@@ -6,6 +6,7 @@ export async function POST(req: NextRequest) {
   try {
     // Ensure the environment variable is available
     const flaskUrl = process.env.FLASK_API_URL;
+    console.log("FLASK_API_URL is: ", flaskUrl);
     if (!flaskUrl) {
       throw new Error("FLASK_API_URL is not defined in your environment variables.");
     }
