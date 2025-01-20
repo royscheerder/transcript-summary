@@ -1,10 +1,11 @@
 import os
 import tempfile
-import openai
+
+from dotenv import load_dotenv
+from openai import OpenAI
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from markitdown import MarkItDown
-from dotenv import load_dotenv
 
 # 1) Load environment variables (for local dev, if you have a .env file).
 load_dotenv()
@@ -14,16 +15,20 @@ api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise ValueError("OPENAI_API_KEY is not set in environment variables.")
 
-# 3) Create Flask app and enable CORS
+# 3) Create an OpenAI client using the new style
+client = OpenAI(
+    api_key=api_key
+)
+
+# 4) Create Flask app and enable CORS
 app = Flask(__name__)
 CORS(app)
 
-# 4) Initialize MarkItDown, openai
+# Initialize MarkItDown
 md = MarkItDown()
-openai.api_key = api_key
 
-# Model name - ensure this is valid for your OpenAI usage
-gpt_model = "o1-mini"
+# Replace "gpt-4o" with a valid model your account has access to (e.g. gpt-3.5-turbo, gpt-4, etc.)
+gpt_model = "gpt-4o"
 
 @app.route('/api/summarize', methods=['POST'])
 def summarize_document():
@@ -36,7 +41,7 @@ def summarize_document():
     print("Received request to /api/summarize")
     
     try:
-        # Retrieve file and prompt
+        # Retrieve file and prompt from the request
         uploaded_file = request.files.get('file')
         prompt = request.form.get('prompt', '')
         
@@ -68,26 +73,23 @@ def summarize_document():
             extracted_text = parse_result.text_content
             
             print("Generating summary with OpenAI")
-            # Use OpenAI ChatCompletion to generate summary
-            response = openai.ChatCompletion.create(
-                model=gpt_model,
+            # Use the new-style client to create a chat completion
+            response = client.chat.completions.create(
                 messages=[
                     {
                         "role": "user",
                         "content": (
-                            f"Summarize the following text based on the user instructions:\n\n"
+                            "Summarize the following text based on the user instructions:\n\n"
                             f"Text:\n{extracted_text}\n\n"
                             f"User prompt:\n{prompt}\n\n"
                             "Summary:"
                         )
                     }
                 ],
-                # Note: "max_completion_tokens" is not a standard parameter;
-                # in official docs, you'd typically use `max_tokens`.
-                max_tokens=1000
+                model=gpt_model
             )
             
-            summary = response.choices[0].message["content"].strip()
+            summary = response.choices[0].message.content.strip()
             print("Summary generated successfully")
 
             return jsonify({"summary": summary}), 200
@@ -104,6 +106,6 @@ def summarize_document():
         print(f"Unexpected error: {str(e)}")
         return jsonify({"error": "An unexpected error occurred"}), 500
 
-# Optional: For local debugging only
+# For local debugging:
 if __name__ == '__main__':
     app.run(debug=True)
